@@ -1,103 +1,63 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Random;
+import java.io.*;
+public class SistemaVentas {
 
-public class GenerateInfoFiles {
+    static Random random = new Random();
 
-    private static final String[] NOMBRES = {
-            "Carlos", "Maria", "Andres", "Luisa", "Juan", "Sofia",
-            "Miguel", "Valentina", "Santiago", "Camila", "Jorge", "Isabella",
-            "David", "Natalia", "Felipe", "Daniela", "Alejandro", "Juliana"
-    };
+    public static void main(String[] args) throws IOException {
+        generarArchivos();
+        procesarVentas();
+    }
 
-    private static final String[] APELLIDOS = {
-            "Garcia", "Rodriguez", "Martinez", "Lopez", "Gonzalez", "Perez",
-            "Sanchez", "Ramirez", "Torres", "Flores", "Rivera", "Gomez",
-            "Diaz", "Reyes", "Morales", "Jimenez", "Cruz", "Vargas"
-    };
+    public static void generarArchivos() throws IOException {
+        BufferedWriter prod = new BufferedWriter(new FileWriter("productos.txt"));
+        for (int i = 1; i <= 5; i++) {
+            prod.write(i + ";Producto" + i + ";" + (10000 * i));
+            prod.newLine();
+        }
+        prod.close();
 
-    private static final String[] NOMBRES_PRODUCTOS = {
-            "Laptop", "Mouse", "Teclado", "Monitor", "Audífonos",
-            "Webcam", "Tablet", "Impresora", "Disco Duro", "Memoria USB",
-            "Celular", "Cargador", "Micrófono", "Silla Ergonómica"
-    };
+        BufferedWriter ven = new BufferedWriter(new FileWriter("vendedores.txt"));
+        for (int i = 1; i <= 3; i++) {
+            ven.write("CC;" + (1000 + i) + ";Vendedor" + i + ";Apellido" + i);
+            ven.newLine();
+        }
+        ven.close();
 
-    private static final String[] TIPOS_DOCUMENTO = { "CC", "TI", "PPT" };
-
-    private static final Random random = new Random();
-
-    public static void main(String[] args) {
-
-        int cantidadVendedores = 5;
-        int cantidadProductos  = 10;
-        int ventasPorVendedor  = 6;
-
-        try {
-            System.out.println("=== Iniciando generación de archivos de prueba ===");
-
-            createProductsFile(cantidadProductos);
-            System.out.println("[OK] Archivo de productos generado: productos.txt");
-
-            createSalesManInfoFile(cantidadVendedores);
-            System.out.println("[OK] Archivo de vendedores generado: vendedores.txt");
-
-            for (int i = 0; i < cantidadVendedores; i++) {
-                String nombre = NOMBRES[random.nextInt(NOMBRES.length)];
-                long   id     = 10000000L + random.nextInt(90000000);
-                createSalesMenFile(ventasPorVendedor, nombre, id, cantidadProductos);
-                System.out.println("[OK] Archivo de ventas generado: sales_" + nombre + "_" + id + ".txt");
+        for (int i = 1; i <= 3; i++) {
+            BufferedWriter sales = new BufferedWriter(new FileWriter("sales_" + i + ".txt"));
+            sales.write("CC;" + (1000 + i));
+            sales.newLine();
+            for (int j = 0; j < 5; j++) {
+                int prodId = random.nextInt(5) + 1;
+                int cant = random.nextInt(10) + 1;
+                sales.write(prodId + ";" + cant);
+                sales.newLine();
             }
-
-            System.out.println("=== Generación de archivos finalizada exitosamente ===");
-
-        } catch (IOException e) {
-            System.err.println("[ERROR] Ocurrió un problema al generar los archivos: " + e.getMessage());
+            sales.close();
         }
     }
 
-    public static void createSalesMenFile(int randomSalesCount, String name, long id, int totalProducts)
-            throws IOException {
+    public static void procesarVentas() throws IOException {
+        Map<Integer, Integer> ventasProducto = new HashMap<>();
 
-        String nombreArchivo = "sales_" + name + "_" + id + ".txt";
+        for (int i = 1; i <= 3; i++) {
+            BufferedReader br = new BufferedReader(new FileReader("sales_" + i + ".txt"));
+            br.readLine();
+            String linea;
 
-        try (BufferedWriter escritor = new BufferedWriter(new FileWriter(nombreArchivo))) {
-            String tipoDocumento = TIPOS_DOCUMENTO[random.nextInt(TIPOS_DOCUMENTO.length)];
-            escritor.write(tipoDocumento + ";" + id);
-            escritor.newLine();
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(";");
+                int id = Integer.parseInt(datos[0]);
+                int cant = Integer.parseInt(datos[1]);
 
-            for (int i = 0; i < randomSalesCount; i++) {
-                int idProducto = random.nextInt(totalProducts) + 1;
-                int cantidad   = random.nextInt(20) + 1;
-                escritor.write(idProducto + ";" + cantidad + ";");
-                escritor.newLine();
+                ventasProducto.put(id, ventasProducto.getOrDefault(id, 0) + cant);
             }
+            br.close();
         }
-    }
 
-    public static void createProductsFile(int productsCount) throws IOException {
-
-        try (BufferedWriter escritor = new BufferedWriter(new FileWriter("productos.txt"))) {
-            for (int i = 1; i <= productsCount; i++) {
-                String nombreProducto = NOMBRES_PRODUCTOS[(i - 1) % NOMBRES_PRODUCTOS.length];
-                int precio = (random.nextInt(300) + 5) * 10000;
-                escritor.write(i + ";" + nombreProducto + ";" + precio);
-                escritor.newLine();
-            }
-        }
-    }
-
-    public static void createSalesManInfoFile(int salesmanCount) throws IOException {
-
-        try (BufferedWriter escritor = new BufferedWriter(new FileWriter("vendedores.txt"))) {
-            for (int i = 0; i < salesmanCount; i++) {
-                String tipoDocumento   = TIPOS_DOCUMENTO[random.nextInt(TIPOS_DOCUMENTO.length)];
-                long   numeroDocumento = 10000000L + random.nextInt(90000000);
-                String nombre          = NOMBRES[random.nextInt(NOMBRES.length)];
-                String apellido        = APELLIDOS[random.nextInt(APELLIDOS.length)];
-                escritor.write(tipoDocumento + ";" + numeroDocumento + ";" + nombre + ";" + apellido);
-                escritor.newLine();
-            }
+        System.out.println("=== REPORTE DE VENTAS ===");
+        for (int id : ventasProducto.keySet()) {
+            System.out.println("Producto " + id + ": " + ventasProducto.get(id));
         }
     }
 }
