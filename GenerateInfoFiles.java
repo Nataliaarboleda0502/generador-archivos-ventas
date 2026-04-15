@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.*;
+
 public class SistemaVentas {
 
     static Random random = new Random();
