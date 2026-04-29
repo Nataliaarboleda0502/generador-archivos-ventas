@@ -1,0 +1,10 @@
+CONCLUSION DEL PROYECTO
+
+1. Lo aprendido:
+Durante el desarrollo del proyecto se adquirieron conocimientos sobre el manejo de archivos en Java, incluyendo lectura y escritura de archivos planos. También se aprendió a procesar información utilizando estructuras de datos como mapas y listas, así como a validar datos y manejar errores.
+
+2. Aplicación profesional:
+Estos conocimientos pueden aplicarse en sistemas reales de información, como sistemas de ventas, inventarios o análisis de datos, donde es necesario procesar grandes volúmenes de información y generar reportes automáticos.
+
+3. Dificultades:
+Durante el desarrollo del proyecto se presentaron dificultades en la lectura de archivos, el manejo de excepciones y la integración de todas las partes del sistema. Sin embargo, estas dificultades permitieron fortalecer la comprensión del funcionamiento del programa.
